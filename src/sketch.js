@@ -30,7 +30,7 @@ let BASE_IMAGE; //will contain BaseImage instance
 // var pg;
 
 //initialize arrays for glitch block types
-let strips = new Array(12).fill(0)
+let strips = new Array(10).fill(0)
 let fragmentsHiRes = new Array(5).fill(0)
 let fragmentsLowRes = new Array(8).fill(0)
 let blackoutBlocks = new Array(12).fill(0)
@@ -63,8 +63,8 @@ function setup() {
       sampleImage: BASE_IMAGE_DATA,
       sampleArea: new Area(0.65, 0.45),
       renderArea: new Area(0.8, 0.6),
-      minSizeRatio: 0.05,
-      maxSizeRatio: 0.1
+      minSizeRatio: 0.075,
+      maxSizeRatio: 0.125
     }).init()
   })
 
@@ -73,8 +73,8 @@ function setup() {
       sampleImage: BASE_IMAGE_DATA,
       sampleArea: new Area(0.75, 0.45),
       renderArea: new Area(0.7, 0.5),
-      minSizeRatio: 0.05,
-      maxSizeRatio: 0.1,
+      minSizeRatio: 0.075,
+      maxSizeRatio: 0.125,
       minSampleRatio: 0.01,
       maxSampleRatio: 0.03
     }).init()
@@ -85,8 +85,8 @@ function setup() {
       sampleImage: BASE_IMAGE_DATA,
       sampleArea: new Area(0.45, 0.35),
       renderArea: new Area(0.6, 0.4),
-      minSizeRatio: 0.1,
-      maxSizeRatio: 0.2,
+      minSizeRatio: 0.125,
+      maxSizeRatio: 0.2125,
       minSampleRatio: 0.15,
       maxSampleRatio: 0.3
     }).init()
@@ -95,8 +95,8 @@ function setup() {
   blackoutBlocks = blackoutBlocks.map(() => {
     return new GlitchBlock({
       renderArea: new Area(0.8, 0.65),
-      minSizeRatio: 0.1,
-      maxSizeRatio: 0.15
+      minSizeRatio: 0.125,
+      maxSizeRatio: 0.175
     }).init()
   })
 
