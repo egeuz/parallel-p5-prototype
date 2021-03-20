@@ -63,7 +63,11 @@ class GlitchBlock {
   }
 
   glitchOut() {
-    this.position = this.generateRenderPosition()
+    let minOffset = 5;
+    let maxOffset = 15;
+    let x = this.originalPos.x + random(minOffset, maxOffset) * floor(random(-1, 2))
+    let y = this.originalPos.y + random(minOffset, maxOffset) * floor(random(-1, 2))
+    this.position = createVector(x, y)
   }
 
   snapBack() {
