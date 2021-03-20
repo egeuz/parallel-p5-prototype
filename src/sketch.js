@@ -54,7 +54,7 @@ function setup() {
   pg = createGraphics(windowWidth, windowHeight)
 
   /** initialize graphics **/
-  BASE_IMAGE = new BaseImage(BASE_IMAGE_DATA, 1.125)
+  BASE_IMAGE = new BaseImage(BASE_IMAGE_DATA, 0.75)
   // BASE_IMAGE.renderOnBuffer(pg)
   BASE_IMAGE.render()
 
