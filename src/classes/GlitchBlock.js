@@ -15,11 +15,15 @@ class GlitchBlock {
     /*** render properties ***/
     this.size;
     this.position;
+    this.originalPos;
   }
 
   init() {
-    this.position = this.generateRenderPosition()
+    let pos = this.generateRenderPosition()
+    this.position = pos;
+    this.originalPos = pos;
     this.size = this.generateRenderSize()
+    console.log(this.originalPos);
     return this;
   }
 
@@ -46,5 +50,24 @@ class GlitchBlock {
     noStroke()
     rect(x, y, w, h)
     pop()
+  }
+
+  resize() {
+    this.sampleArea.resize()
+    this.placementArea.resize()
+    let newMinSize = width * this.minSizeRatio
+    let newMaxSize = width * this.maxSizeRato * 0.5625
+
+    // this.minSize = width * this.minSizeRatio
+    // this.maxSize = width * this.maxSizeRatio
+  }
+
+  glitchOut() {
+    this.position = this.generateRenderPosition()
+  }
+
+  snapBack() {
+    // console.log(this.originalPos)
+    this.position = this.originalPos;
   }
 }

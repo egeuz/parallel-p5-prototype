@@ -12,6 +12,10 @@ class BaseImage {
     image(this.image, this.x, this.y, this.w, this.h)
   }
 
+  renderOnBuffer(pg) {
+    pg.image(this.image, this.x, this.y, this.w, this.h)
+  }
+
   resize() {
     this.x = width / 2;
     this.y = height / 2;

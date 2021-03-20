@@ -6,9 +6,9 @@ var canvas = document.createElement("div")
 canvas.style.width = "100%";
 canvas.style.height = "100%";
 // canvas.style.filter = "hue-rotate(25deg) brightness(1)";
-canvas.style.position="absolute";
-canvas.style.top="0";
-canvas.style.left="0";
+canvas.style.position = "absolute";
+canvas.style.top = "0";
+canvas.style.left = "0";
 canvas.style.zIndex = "-1";
 
 canvas.id = "canvas-bg"
@@ -27,29 +27,35 @@ document.body.appendChild(canvas)
 const BASE_IMAGE_FILENAME = "./assets/base-image.png"
 let BASE_IMAGE_DATA; //will contain p5.Image
 let BASE_IMAGE; //will contain BaseImage instance
+// var pg;
 
 //initialize arrays for glitch block types
-let strips = new Array(15).fill(0)
+let strips = new Array(12).fill(0)
 let fragmentsHiRes = new Array(5).fill(0)
-let fragmentsLowRes = new Array(10).fill(0)
-let blackoutBlocks = new Array(10).fill(0)
+let fragmentsLowRes = new Array(8).fill(0)
+let blackoutBlocks = new Array(12).fill(0)
 let patternBlocks = new Array(10).fill(0)
 let sampleBlocks = [] //final mixed container for strips/fragments
 
-let testBlocks = new Array(20).fill(0);
+let prevMouseX;
+let prevMouseY;
+let prevMouseDelta = 0;
 
 function preload() {
   BASE_IMAGE_DATA = loadImage("./assets/base-image.png");
 }
 
 function setup() {
+  frameRate(10)
   rectMode(CENTER)
   imageMode(CENTER)
   createCanvas(windowWidth, windowHeight)
     .parent("canvas-bg")
+  pg = createGraphics(windowWidth, windowHeight)
 
   /** initialize graphics **/
   BASE_IMAGE = new BaseImage(BASE_IMAGE_DATA, 0.75)
+  // BASE_IMAGE.renderOnBuffer(pg)
   BASE_IMAGE.render()
 
   strips = strips.map(() => {
@@ -62,11 +68,10 @@ function setup() {
     }).init()
   })
 
-  loresTestSample = new Area(0.65, 0.6),
   fragmentsLowRes = fragmentsLowRes.map(() => {
     return new GlitchFragment({
       sampleImage: BASE_IMAGE_DATA,
-      sampleArea: loresTestSample,
+      sampleArea: new Area(0.75, 0.45),
       renderArea: new Area(0.7, 0.5),
       minSizeRatio: 0.05,
       maxSizeRatio: 0.1,
@@ -91,14 +96,15 @@ function setup() {
     return new GlitchBlock({
       renderArea: new Area(0.8, 0.65),
       minSizeRatio: 0.1,
-      maxSizeRatio: 0.2
+      maxSizeRatio: 0.15
     }).init()
   })
 
-
-
   //consolidate and shuffle strips & fragments into one layer
-  // sampleBlocks = shuffle([...fragmentsHiRes, ...fragmentsLowRes, ...strips])
+  sampleBlocks = shuffle([...fragmentsHiRes, ...fragmentsLowRes, ...strips])
+
+  prevMouseX = mouseX;
+  prevMouseY = mouseY;
 }
 
 function windowResized() {
@@ -107,15 +113,30 @@ function windowResized() {
 }
 
 function draw() {
-  clear()
+  mouseDelta = dist(mouseX, mouseY, prevMouseX, prevMouseY)
+  if (mouseDelta > 3) {
+    glitchOut()
+  } else if (prevMouseDelta != mouseDelta) {
+    snapBack()
+  }
+  background(0)
   BASE_IMAGE.render()
   blackoutBlocks.forEach(block => block.render())
-  fragmentsLowRes.forEach(fragment => fragment.render())
-  fragmentsHiRes.forEach(fragment => fragment.render())
-  strips.forEach(strip => strip.render())
-  // loresTestSample.render()
+  sampleBlocks.forEach(block => block.render())
+  //set mousePos
 
-  // sampleBlocks.forEach(block => block.render())
+  prevMouseX = mouseX
+  prevMouseY = mouseY
+  prevMouseDelta = mouseDelta
+}
+
+function glitchOut() {
+  sampleBlocks.forEach(sample => sample.glitchOut())
+  blackoutBlocks.forEach(block => block.init())
+}
+
+function snapBack() {
+  sampleBlocks.forEach(sample => sample.snapBack())
 }
 
 /*** HELPER METHODS ***/

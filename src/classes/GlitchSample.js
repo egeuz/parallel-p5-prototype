@@ -8,7 +8,9 @@ class GlitchSample extends GlitchBlock {
 
   init() {
     this.sample = this.generateSample()
-    this.position = this.generateRenderPosition()
+    let pos = this.generateRenderPosition()
+    this.position = pos;
+    this.originalPos = pos;
     this.size = this.generateRenderSize()
     return this;
   }
@@ -29,6 +31,11 @@ class GlitchSample extends GlitchBlock {
       w: this.getRandomSize(),
       h: this.getRandomSize() * 0.5625
     }
+  }
+
+  glitchOut() {
+    this.position = this.generateRenderPosition()
+    if (random() < 0.1) this.sample = this.generateSample()
   }
 
   render() {
