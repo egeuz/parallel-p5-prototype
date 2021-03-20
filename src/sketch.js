@@ -54,7 +54,7 @@ function setup() {
   pg = createGraphics(windowWidth, windowHeight)
 
   /** initialize graphics **/
-  BASE_IMAGE = new BaseImage(BASE_IMAGE_DATA, 0.75)
+  BASE_IMAGE = new BaseImage(BASE_IMAGE_DATA, 1.125)
   // BASE_IMAGE.renderOnBuffer(pg)
   BASE_IMAGE.render()
 
@@ -63,8 +63,8 @@ function setup() {
       sampleImage: BASE_IMAGE_DATA,
       sampleArea: new Area(0.65, 0.45),
       renderArea: new Area(0.8, 0.6),
-      minSizeRatio: 0.075,
-      maxSizeRatio: 0.125
+      minSizeRatio: 0.075 * 0.2,
+      maxSizeRatio: 0.125 * 0.2
     }).init()
   })
 
@@ -73,8 +73,8 @@ function setup() {
       sampleImage: BASE_IMAGE_DATA,
       sampleArea: new Area(0.75, 0.45),
       renderArea: new Area(0.7, 0.5),
-      minSizeRatio: 0.075,
-      maxSizeRatio: 0.125,
+      minSizeRatio: 0.075 * 0.2,
+      maxSizeRatio: 0.125 * 0.2,
       minSampleRatio: 0.01,
       maxSampleRatio: 0.03
     }).init()
@@ -85,8 +85,8 @@ function setup() {
       sampleImage: BASE_IMAGE_DATA,
       sampleArea: new Area(0.45, 0.35),
       renderArea: new Area(0.6, 0.4),
-      minSizeRatio: 0.125,
-      maxSizeRatio: 0.2125,
+      minSizeRatio: 0.125 * 0.2,
+      maxSizeRatio: 0.2125 * 0.2,
       minSampleRatio: 0.15,
       maxSampleRatio: 0.3
     }).init()
@@ -95,8 +95,8 @@ function setup() {
   blackoutBlocks = blackoutBlocks.map(() => {
     return new GlitchBlock({
       renderArea: new Area(0.8, 0.65),
-      minSizeRatio: 0.125,
-      maxSizeRatio: 0.175
+      minSizeRatio: 0.125 * 0.2,
+      maxSizeRatio: 0.175 * 0.2
     }).init()
   })
 

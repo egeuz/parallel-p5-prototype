@@ -34,7 +34,12 @@ class GlitchSample extends GlitchBlock {
   }
 
   glitchOut() {
-    this.position = this.generateRenderPosition()
+    // super.glitchOut()
+    let minOffset = 25;
+    let maxOffset = 75;
+    let x = this.originalPos.x + random(minOffset, maxOffset) * floor(random(-1, 2))
+    let y = this.originalPos.y + random(minOffset, maxOffset) * floor(random(-1, 2))
+    this.position = createVector(x, y)
     if (random() < 0.1) this.sample = this.generateSample()
   }
 
