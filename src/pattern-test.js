@@ -1,49 +1,41 @@
-class GlitchPattern extends GlitchBlock {
-  constructor(config) {
-    super(config)
-    this.sampleArea = config.sampleArea;
+let pattern;
+function setup() {
+  createCanvas(windowWidth, windowHeight)
+  pattern = new PatternTest(
+    createVector(300, 300),
+    { w: 150, h: 150 },
+    "#f9578a",
+    "#121212"
+  ).init()
+}
 
-    this.bgColor = "#00000000" //transparent
-    /*** pattern properties ***/
-    this.colors = [
-      "#985948",
-      "#8f2fda",
-      "#DD6432",
-      "#091734",
-      "#31569C"
-    ]
+function draw() {
+  pattern.render()
+}
+
+class PatternTest {
+
+  constructor(position, size, c, bg) {
+    this.position = position
+    this.size = size
+    this.color = c
+    this.bgColor = bg
     this.patternTypes = [
       "strokedCheckers",
       "checkers",
       "barcode",
     ]
-    this.color = random(this.colors);
     this.pattern = random(this.patternTypes)
     this.renders = []
   }
 
   init() {
-    let pos = this.generateRenderPosition()
-    this.position = pos;
-    this.originalPos = pos;
-    this.size = this.generateRenderSize()
-    // this.initColor()
-    this.initPattern()
-    return this;
-  }
-
-  initColor() {
-    let {x, y} = this.sampleArea.getRandomPoint()
-    let [r, g, b] = get(x, y)
-    this.color = color(r, g, b)
-  }
-
-  initPattern() {
     const { x, y } = this.position;
     const { w, h } = this.size;
     if (this[`${this.pattern}Init`]) {
       this[`${this.pattern}Init`](x, y, w, h, this.color, this.bgColor)
     }
+    return this;
   }
 
   render() {
@@ -51,21 +43,6 @@ class GlitchPattern extends GlitchBlock {
     const { w, h } = this.size;
     this[this.pattern](x, y, w, h, this.color, this.bgColor)
   }
-
-  glitchOut() {
-    let minOffset = 25;
-    let maxOffset = 75;
-    let x = this.originalPos.x + random(minOffset, maxOffset) * floor(random(-1, 2))
-    let y = this.originalPos.y + random(minOffset, maxOffset) * floor(random(-1, 2))
-    this.position = createVector(x, y)
-    this.initPattern()
-  }
-
-  /***********************/
-  /*** PATTERN METHODS ***/
-  /*** get ready, this ***/
-  /***** is gonna be *****/
-  /**** a long journey ***/
 
   strokedCheckers(x, y, w, h, c, bgc) {
     const res = 14;
@@ -82,20 +59,19 @@ class GlitchPattern extends GlitchBlock {
 
       function drawRowType1(y, color) {
         push()
-        // rectMode(CORNER)
         fill(color)
         noStroke()
         rect(x + blockW, y, blockW, blockH)
         rect(x + 5 * blockW, y, blockW, blockH)
-        rect(x + 8 * blockW, y, blockW, blockH)
-        rect(x + 12 * blockW, y, blockW, blockH)
+        rect(x + w - 6 * blockW, y, blockW, blockH)
+        rect(x + w - 2 * blockW, y, blockW, blockH)
         pop()
       }
 
       function drawRowType2(y) {
         fill(c)
         noStroke()
-        rect(x + 6.5 * blockW, y, w, blockH)
+        rect(x, y, w, blockH)
         drawRowType1(y, bgc)
       }
     }
@@ -117,7 +93,6 @@ class GlitchPattern extends GlitchBlock {
   }
 
   barcodeInit(x, y, w, h) {
-    this.renders = []
     const minStripW = w * 0.04;
     const maxStripW = w * 0.15;
     let totalW = 0;
@@ -148,4 +123,6 @@ class GlitchPattern extends GlitchBlock {
       rect(r.x, r.y, r.w, r.h)
     })
   }
+
+
 }

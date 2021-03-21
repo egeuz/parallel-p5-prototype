@@ -19,7 +19,7 @@ class GlitchSample extends GlitchBlock {
     const {x, y} = this.generateSamplePosition();
     const {w, h} = this.generateSampleSize();
     this.sampledAreaTester = [x, y, w, h]
-    return get(x, y, w, h);
+    return this.sampleImage.get(x, y, w, h);
   }
 
   generateSamplePosition() {
@@ -34,13 +34,12 @@ class GlitchSample extends GlitchBlock {
   }
 
   glitchOut() {
-    // super.glitchOut()
-    let minOffset = 25;
-    let maxOffset = 75;
+    let minOffset = 15;
+    let maxOffset = 45;
     let x = this.originalPos.x + random(minOffset, maxOffset) * floor(random(-1, 2))
     let y = this.originalPos.y + random(minOffset, maxOffset) * floor(random(-1, 2))
     this.position = createVector(x, y)
-    if (random() < 0.1) this.sample = this.generateSample()
+    if (random() < 0.4) this.sample = this.generateSample()
   }
 
   render() {

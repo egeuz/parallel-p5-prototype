@@ -9,7 +9,6 @@ class GlitchFragment extends GlitchSample {
   }
 
   generateSampleSize() {
-
     // console.log(this.minSampleSize, this.maxSampleSize)
     return {
       w: floor(random(this.minSampleSize, this.maxSampleSize)),
