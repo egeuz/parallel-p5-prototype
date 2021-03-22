@@ -29,7 +29,7 @@ class GlitchSample extends GlitchBlock {
   generateSampleSize() {
     return {
       w: this.getRandomSize(),
-      h: this.getRandomSize() * 0.5625
+      h: this.getRandomSize() * 1.78
     }
   }
 

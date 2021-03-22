@@ -17,9 +17,7 @@ class GlitchBlock {
   }
 
   init() {
-    let pos = this.generateRenderPosition()
-    this.position = pos;
-    this.originalPos = pos;
+    this.position = this.generateRenderPosition()
     this.size = this.generateRenderSize()
     return this;
   }
@@ -49,22 +47,13 @@ class GlitchBlock {
     pop()
   }
 
-  resize() {
-    // this.sampleArea.resize()
-    this.placementArea.resize()
+  resize(w) {
+    this.renderArea.resize()
     let newMinSize = width * this.minSizeRatio
-    let newMaxSize = width * this.maxSizeRato * 0.5625
-
-    // this.minSize = width * this.minSizeRatio
-    // this.maxSize = width * this.maxSizeRatio
-  }
-
-  glitchOut() {
-    let minOffset = 5;
-    let maxOffset = 15;
-    let x = this.originalPos.x + random(minOffset, maxOffset) * floor(random(-1, 2))
-    let y = this.originalPos.y + random(minOffset, maxOffset) * floor(random(-1, 2))
-    this.position = createVector(x, y)
+    let newMaxSize = width * this.maxSizeRatio
+    this.minSize = newMinSize;
+    this.maxSize = newMaxSize;
+    this.init()
   }
 
   snapBack() {

@@ -27,7 +27,7 @@ document.getElementById("left-col").appendChild(canvas)
 /******************/
 //base image variables
 const ASPECT_RATIO = 1.78; //0.5625
-const BASE_IMAGE_FILE = "../assets/base_image.png"
+const BASE_IMAGE_FILE = "./assets/base_image.png"
 let BASE_IMAGE_DATA; //will contain p5.Image
 let BASE_IMAGE; //will contain BaseImage instance
 
@@ -380,6 +380,28 @@ class GlitchFragment extends GlitchSample {
       w: floor(random(this.minSampleSize, this.maxSampleSize)),
       h: floor(random(this.minSampleSize, this.maxSampleSize)) * 1.78
     }
+  }
+}
+
+class BaseImage {
+  constructor(img, scale) {
+    this.image = img;
+    this.x = width / 2;
+    this.y = height / 2;
+    this.w = width * scale;
+    this.h = height * scale;
+    this.scale = scale;
+  }
+
+  render() {
+    image(this.image, this.x, this.y, this.w, this.h)
+  }
+
+  resize() {
+    this.x = width / 2;
+    this.y = height / 2;
+    this.w = width * this.scale;
+    this.h = height * this.scale;
   }
 }
 
