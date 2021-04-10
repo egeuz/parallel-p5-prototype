@@ -4,13 +4,12 @@
 const CANVAS_BREAKPOINT = 700;
 var canvas = document.createElement("div")
 canvas.style.width = "100%";
-canvas.style.height = "100%";
+canvas.style.height = "100vh";
 // canvas.style.filter = "hue-rotate(25deg) brightness(1)";
 canvas.style.position = "absolute";
 canvas.style.top = "0";
 canvas.style.left = "0";
 canvas.style.zIndex = "-1";
-
 canvas.id = "canvas-bg"
 //handle basic responsiveness for canvas element
 canvas.style.display = window.innerWidth >= 700 ? "block" : "none"
@@ -18,7 +17,7 @@ window.addEventListener("resize", () => {
   canvas.style.display = window.innerWidth >= 700 ? "block" : "none"
 })
 //change document.body to whatever element we're sticking this into
-document.getElementById("left-col").appendChild(canvas)
+document.body.appendChild(canvas)
 /******END DOM SETUP ******/
 
 
@@ -26,7 +25,7 @@ document.getElementById("left-col").appendChild(canvas)
 /*** P5 RUNTIME ***/
 /******************/
 //base image variables
-const ASPECT_RATIO = 1.78; //0.5625
+const ASPECT_RATIO = 0.5625; //0.5625 - horizontal //1.78 = vertical
 const BASE_IMAGE_FILE = "./assets/base_image.png"
 let BASE_IMAGE_DATA; //will contain p5.Image
 let BASE_IMAGE; //will contain BaseImage instance
@@ -49,10 +48,12 @@ function setup() {
   imageMode(CENTER)
 
   const w = document.getElementById("canvas-bg").clientWidth
-  createCanvas(w, w * ASPECT_RATIO)
+  const h = document.getElementById("canvas-bg").clientHeight
+  //for horizontal, replace w/: h = w * ASPECT_RATIO
+  createCanvas(w, h)
     .parent("canvas-bg")
 
-  BASE_IMAGE = new BaseImage(BASE_IMAGE_DATA, 0.95)
+  BASE_IMAGE = new BaseImage(BASE_IMAGE_DATA, 0.75) //1 ratio for column
   generateSamples()
   generateBlackouts()
 
@@ -61,7 +62,9 @@ function setup() {
 
 function windowResized() {
   const w = document.getElementById("canvas-bg").clientWidth
-  resizeCanvas(w, w * ASPECT_RATIO)
+  const h = document.getElementById("canvas-bg").clientHeight
+  //for horizontal, replace w/: h = w * ASPECT_RATIO
+  resizeCanvas(w, h)
   BASE_IMAGE.resize()
   sampleBlocks.forEach(block => {
     block.resize()
@@ -94,10 +97,10 @@ function generateSamples() {
   for (let i = 0; i < NUM_STRIPS; i++) {
     const strip = new GlitchStrip({
       sampleImage: BASE_IMAGE_DATA,
-      sampleArea: new Area(1, 0.01, BASE_IMAGE_DATA).init(),
-      renderArea: new Area(0.8).init(),
-      minSizeRatio: 0.04 * 1.5, //0.04
-      maxSizeRatio: 0.017 * 1.5 //0.017
+      sampleArea: new Area(0.65, 0.4, BASE_IMAGE_DATA).init(),
+      renderArea: new Area(0.45).init(),
+      minSizeRatio: 0.04 * 0.9, //0.04
+      maxSizeRatio: 0.017 * 0.9 //0.017
     }).init()
     sampleBlocks.push(strip)
   }
@@ -105,10 +108,10 @@ function generateSamples() {
   for (let i = 0; i < NUM_HIGH_RES_FRAGMENTS; i++) {
     const fragment = new GlitchFragment({
       sampleImage: BASE_IMAGE_DATA,
-      sampleArea: new Area(1, 0.1, BASE_IMAGE_DATA).init(),
-      renderArea: new Area(0.8).init(),
-      minSizeRatio: 0.09 * 1.5,
-      maxSizeRatio: 0.16 * 1.5,
+      sampleArea: new Area(0.75, 0.1, BASE_IMAGE_DATA).init(),
+      renderArea: new Area(0.5).init(),
+      minSizeRatio: 0.09 * .9,
+      maxSizeRatio: 0.16 * .9,
       minSampleRatio: 0.2,
       maxSampleRatio: 0.25
     }).init()
@@ -118,10 +121,10 @@ function generateSamples() {
   for (let i = 0; i < NUM_LOW_RES_FRAGMENTS; i++) {
     const fragment = new GlitchFragment({
       sampleImage: BASE_IMAGE_DATA,
-      sampleArea: new Area(1, 0.4, BASE_IMAGE_DATA).init(),
-      renderArea: new Area(0.8).init(),
-      minSizeRatio: 0.04 * 1.5,
-      maxSizeRatio: 0.07 * 1.5,
+      sampleArea: new Area(0.75, 0.4, BASE_IMAGE_DATA).init(),
+      renderArea: new Area(0.6).init(),
+      minSizeRatio: 0.04 * .9,
+      maxSizeRatio: 0.07 * .9,
       minSampleRatio: 0.1,
       maxSampleRatio: 0.15
     }).init()
@@ -134,7 +137,7 @@ function generateSamples() {
 function generateBlackouts() {
   for (let i = 0; i < NUM_BLACKOUTS; i++) {
     const fragment = new GlitchBlock({
-      renderArea: new Area(0.85, 0.6).init(),
+      renderArea: new Area(0.8, 0.6).init(),
       minSizeRatio: 0.1,
       maxSizeRatio: 0.24
     }).init()
@@ -163,7 +166,7 @@ function shuffle(array) {
 class Area {
   constructor(outerLimit, innerLimit, source) {
     this.baseW = source ? source.width : width
-    this.baseH = source ? source.height : height
+    this.baseH = source ? source.height : width * 0.5625
     this.outerLimit = outerLimit;
     this.innerLimit = innerLimit;
     this.areas;
@@ -209,7 +212,7 @@ class Area {
   getScaledRect(scale) {
     const margin = (1 - scale) / 2; //horizontal margin
     const w = this.baseW * scale;
-    const h = w * 1.78; //16:9 aspect ratio -- 0.5625 for horizontal image
+    const h = w * 0.5625; //16:9 aspect ratio -- 0.5625 for horizontal image
     const x = this.baseW * margin;
     const y = (this.baseH - h) / 2;
     return [x, y, w, h]
@@ -265,7 +268,7 @@ class GlitchBlock {
     pop()
   }
 
-  resize(w) {
+  resize() {
     this.renderArea.resize()
     let newMinSize = width * this.minSizeRatio
     let newMaxSize = width * this.maxSizeRatio
@@ -310,7 +313,7 @@ class GlitchSample extends GlitchBlock {
   generateSampleSize() {
     return {
       w: this.getRandomSize(),
-      h: this.getRandomSize() * 1.78
+      h: this.getRandomSize() * 0.5625
     }
   }
 
@@ -378,7 +381,7 @@ class GlitchFragment extends GlitchSample {
   generateSampleSize() {
     return {
       w: floor(random(this.minSampleSize, this.maxSampleSize)),
-      h: floor(random(this.minSampleSize, this.maxSampleSize)) * 1.78
+      h: floor(random(this.minSampleSize, this.maxSampleSize)) * 0.5625
     }
   }
 }
@@ -394,14 +397,14 @@ class BaseImage {
   }
 
   render() {
-    image(this.image, this.x, this.y, this.w, this.h)
+    image(this.image, this.x, this.y , this.w, this.h)
   }
 
   resize() {
     this.x = width / 2;
     this.y = height / 2;
     this.w = width * this.scale;
-    this.h = height * this.scale;
+    this.h = width * ASPECT_RATIO * this.scale;
   }
 }
 
