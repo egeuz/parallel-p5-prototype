@@ -17,7 +17,6 @@ body {
 .col {
   border: 1px solid #fff;
   height: inherit;
-  /* height: 150vh; */
   overflow-y: scroll;
 }
 

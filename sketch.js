@@ -17,8 +17,22 @@ canvas.style.display = window.innerWidth >= 700 ? "block" : "none"
 window.addEventListener("resize", () => {
   canvas.style.display = window.innerWidth >= 700 ? "block" : "none"
 })
+
+/*** GET THE ID OF THE ELEMENT WHERE THE SKETCH WILL LIVE ***/
+let containerID;
+if (document.currentScript) {
+  containerID = document.currentScript.getAttribute("containerID")
+} else {
+  const scripts = document.getElementsByTagName('script');
+  //find this script out of list of scripts
+  scripts.forEach(script => {
+    if (script.getAttribute("containerID")) {
+      containerID = script.getAttribute("containerID")
+    }
+  })
+}
 //change document.body to whatever element we're sticking this into
-document.getElementById("left-col").appendChild(canvas)
+document.getElementById(containerID).appendChild(canvas)
 /******END DOM SETUP ******/
 
 
@@ -26,6 +40,7 @@ document.getElementById("left-col").appendChild(canvas)
 /*** P5 RUNTIME ***/
 /******************/
 //base image variables
+let pg;
 const ASPECT_RATIO = 1.78; //0.5625
 const BASE_IMAGE_FILE = "./assets/base_image.png"
 let BASE_IMAGE_DATA; //will contain p5.Image
@@ -39,24 +54,30 @@ const NUM_BLACKOUTS = 16;
 const sampleBlocks = []
 const blackoutBlocks = []
 
+//glitch shader variables
+let glitchShader;
+
 function preload() {
   BASE_IMAGE_DATA = loadImage(BASE_IMAGE_FILE)
+  glitchShader = loadShader("./shader/glitch.vert", "./shader/glitch.frag")
 }
 
 function setup() {
   frameRate(24)
   rectMode(CENTER)
   imageMode(CENTER)
+  noStroke()
 
   const w = document.getElementById("canvas-bg").clientWidth
-  createCanvas(w, w * ASPECT_RATIO)
+  createCanvas(w, w * ASPECT_RATIO, WEBGL)
     .parent("canvas-bg")
 
-  BASE_IMAGE = new BaseImage(BASE_IMAGE_DATA, 0.95)
+  pg = createGraphics(w, w * ASPECT_RATIO, WEBGL)
+  pg.imageMode(CENTER)
+
+  BASE_IMAGE = new BaseImage(BASE_IMAGE_DATA, 0.9)
   generateSamples()
   generateBlackouts()
-
-  window.addEventListener("scroll", () => { if (random() < 0.55) glitchOut() })
 }
 
 function windowResized() {
@@ -69,15 +90,27 @@ function windowResized() {
   blackoutBlocks.forEach(block => {
     block.resize()
   })
+
+
 }
 
 function draw() {
+  shader(glitchShader)
+  glitchShader.setUniform("iResolution", [width, height]);
+  glitchShader.setUniform("iFrame", frameCount);
+  glitchShader.setUniform("iMouse", [mouseX, mouseY]);
+  glitchShader.setUniform("iTime", frameCount * 0.001);
+  glitchShader.setUniform("iChannel0", pg);
+
   clear()
   BASE_IMAGE.render()
   blackoutBlocks.forEach(block => block.render())
   sampleBlocks.forEach(block => block.render())
 
   if (noise(frameCount) < 0.25) glitchOut()
+
+  rect(0, 0, width, height)
+
 }
 
 function mouseMoved() {
@@ -95,7 +128,7 @@ function generateSamples() {
     const strip = new GlitchStrip({
       sampleImage: BASE_IMAGE_DATA,
       sampleArea: new Area(1, 0.01, BASE_IMAGE_DATA).init(),
-      renderArea: new Area(0.8).init(),
+      renderArea: new Area(0.7).init(),
       minSizeRatio: 0.04 * 1.5, //0.04
       maxSizeRatio: 0.017 * 1.5 //0.017
     }).init()
@@ -106,7 +139,7 @@ function generateSamples() {
     const fragment = new GlitchFragment({
       sampleImage: BASE_IMAGE_DATA,
       sampleArea: new Area(1, 0.1, BASE_IMAGE_DATA).init(),
-      renderArea: new Area(0.8).init(),
+      renderArea: new Area(0.7).init(),
       minSizeRatio: 0.09 * 1.5,
       maxSizeRatio: 0.16 * 1.5,
       minSampleRatio: 0.2,
@@ -119,7 +152,7 @@ function generateSamples() {
     const fragment = new GlitchFragment({
       sampleImage: BASE_IMAGE_DATA,
       sampleArea: new Area(1, 0.4, BASE_IMAGE_DATA).init(),
-      renderArea: new Area(0.8).init(),
+      renderArea: new Area(0.7).init(),
       minSizeRatio: 0.04 * 1.5,
       maxSizeRatio: 0.07 * 1.5,
       minSampleRatio: 0.1,
@@ -134,7 +167,7 @@ function generateSamples() {
 function generateBlackouts() {
   for (let i = 0; i < NUM_BLACKOUTS; i++) {
     const fragment = new GlitchBlock({
-      renderArea: new Area(0.85, 0.6).init(),
+      renderArea: new Area(0.75, 0.55).init(),
       minSizeRatio: 0.1,
       maxSizeRatio: 0.24
     }).init()
@@ -256,13 +289,13 @@ class GlitchBlock {
   }
 
   render() {
-    const {x, y} = this.position;
-    const {w, h} = this.size;
-    push()
-    fill("#121212")
-    noStroke()
-    rect(x, y, w, h)
-    pop()
+    const { x, y } = this.position;
+    const { w, h } = this.size;
+    pg.push()
+    pg.fill("#121212")
+    pg.noStroke()
+    pg.rect(x, y, w, h)
+    pg.pop()
   }
 
   resize(w) {
@@ -280,7 +313,7 @@ class GlitchBlock {
 }
 
 class GlitchSample extends GlitchBlock {
-  constructor (config) {
+  constructor(config) {
     super(config)
     this.sampleImage = config.sampleImage;
     this.sampleArea = config.sampleArea;
@@ -297,8 +330,8 @@ class GlitchSample extends GlitchBlock {
   }
 
   generateSample() {
-    const {x, y} = this.generateSamplePosition();
-    const {w, h} = this.generateSampleSize();
+    const { x, y } = this.generateSamplePosition();
+    const { w, h } = this.generateSampleSize();
     this.sampledAreaTester = [x, y, w, h]
     return this.sampleImage.get(x, y, w, h);
   }
@@ -324,12 +357,12 @@ class GlitchSample extends GlitchBlock {
   }
 
   render() {
-    const {x, y} = this.position;
-    const {w, h} = this.size;
-    push()
-    noSmooth()
-    image(this.sample, x, y, w, h)
-    pop()
+    const { x, y } = this.position;
+    const { w, h } = this.size;
+    pg.push()
+    pg.noSmooth()
+    pg.image(this.sample, x - pg.width / 2, y - pg.height / 2, w, h)
+    pg.pop()
   }
 }
 
@@ -386,20 +419,20 @@ class GlitchFragment extends GlitchSample {
 class BaseImage {
   constructor(img, scale) {
     this.image = img;
-    this.x = width / 2;
-    this.y = height / 2;
+    this.x = pg.width / 2;
+    this.y = pg.height / 2;
     this.w = width * scale;
     this.h = height * scale;
     this.scale = scale;
   }
 
   render() {
-    image(this.image, this.x, this.y, this.w, this.h)
+    pg.image(this.image, 0, 0, this.w, this.h)
   }
 
   resize() {
-    this.x = width / 2;
-    this.y = height / 2;
+    this.x = pg.width / 2;
+    this.y = pg.height / 2;
     this.w = width * this.scale;
     this.h = height * this.scale;
   }
