@@ -4,13 +4,12 @@
 const CANVAS_BREAKPOINT = 700;
 var canvas = document.createElement("div")
 canvas.style.width = "100%";
-canvas.style.height = "100%";
+canvas.style.height = "100vh";
 // canvas.style.filter = "hue-rotate(25deg) brightness(1)";
 canvas.style.position = "absolute";
 canvas.style.top = "0";
 canvas.style.left = "0";
 canvas.style.zIndex = "-1";
-
 canvas.id = "canvas-bg"
 //handle basic responsiveness for canvas element
 canvas.style.display = window.innerWidth >= 700 ? "block" : "none"
@@ -32,7 +31,9 @@ if (document.currentScript) {
   })
 }
 //change document.body to whatever element we're sticking this into
-document.getElementById(containerID).appendChild(canvas)
+const container = document.getElementById(containerID)
+container.style.position = "relative"
+container.appendChild(canvas)
 /******END DOM SETUP ******/
 
 
@@ -82,7 +83,9 @@ function setup() {
 
 function windowResized() {
   const w = document.getElementById("canvas-bg").clientWidth
-  resizeCanvas(w, w * ASPECT_RATIO)
+  const h = document.getElementById("canvas-bg").clientHeight
+  //for horizontal, replace w/: h = w * ASPECT_RATIO
+  resizeCanvas(w, h)
   BASE_IMAGE.resize()
   sampleBlocks.forEach(block => {
     block.resize()
@@ -110,6 +113,8 @@ function draw() {
   if (noise(frameCount) < 0.25) glitchOut()
 
   rect(0, 0, width, height)
+
+  pg.clear()
 
 }
 
@@ -152,7 +157,7 @@ function generateSamples() {
     const fragment = new GlitchFragment({
       sampleImage: BASE_IMAGE_DATA,
       sampleArea: new Area(1, 0.4, BASE_IMAGE_DATA).init(),
-      renderArea: new Area(0.7).init(),
+      renderArea: new Area(1).init(),
       minSizeRatio: 0.04 * 1.5,
       maxSizeRatio: 0.07 * 1.5,
       minSampleRatio: 0.1,
@@ -195,8 +200,8 @@ function shuffle(array) {
 /***************/
 class Area {
   constructor(outerLimit, innerLimit, source) {
-    this.baseW = source ? source.width : width
-    this.baseH = source ? source.height : height
+    this.baseW = source ? source.width : pg.width
+    this.baseH = source ? source.height : pg.height
     this.outerLimit = outerLimit;
     this.innerLimit = innerLimit;
     this.areas;
@@ -298,7 +303,7 @@ class GlitchBlock {
     pg.pop()
   }
 
-  resize(w) {
+  resize() {
     this.renderArea.resize()
     let newMinSize = width * this.minSizeRatio
     let newMaxSize = width * this.maxSizeRatio
@@ -361,7 +366,7 @@ class GlitchSample extends GlitchBlock {
     const { w, h } = this.size;
     pg.push()
     pg.noSmooth()
-    pg.image(this.sample, x - pg.width / 2, y - pg.height / 2, w, h)
+    pg.image(this.sample, x - width / 2, y - height / 2, w, h)
     pg.pop()
   }
 }
@@ -434,7 +439,7 @@ class BaseImage {
     this.x = pg.width / 2;
     this.y = pg.height / 2;
     this.w = width * this.scale;
-    this.h = height * this.scale;
+    this.h = width * ASPECT_RATIO * this.scale;
   }
 }
 
