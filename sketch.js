@@ -64,10 +64,13 @@ function preload() {
 }
 
 function setup() {
+  pixelDensity(1)
+  setAttributes({})
   frameRate(24)
   rectMode(CENTER)
   imageMode(CENTER)
   noStroke()
+
 
   const w = document.getElementById("canvas-bg").clientWidth
   createCanvas(w, w * ASPECT_RATIO, WEBGL)
@@ -83,9 +86,10 @@ function setup() {
 
 function windowResized() {
   const w = document.getElementById("canvas-bg").clientWidth
-  const h = document.getElementById("canvas-bg").clientHeight
+  const h = w * 1.78
   //for horizontal, replace w/: h = w * ASPECT_RATIO
   resizeCanvas(w, h)
+
   BASE_IMAGE.resize()
   sampleBlocks.forEach(block => {
     block.resize()
@@ -93,8 +97,6 @@ function windowResized() {
   blackoutBlocks.forEach(block => {
     block.resize()
   })
-
-
 }
 
 function draw() {
@@ -105,7 +107,7 @@ function draw() {
   glitchShader.setUniform("iTime", frameCount * 0.001);
   glitchShader.setUniform("iChannel0", pg);
 
-  clear()
+  // clear()
   BASE_IMAGE.render()
   blackoutBlocks.forEach(block => block.render())
   sampleBlocks.forEach(block => block.render())
@@ -114,7 +116,7 @@ function draw() {
 
   rect(0, 0, width, height)
 
-  pg.clear()
+  // pg.clear()
 
 }
 
