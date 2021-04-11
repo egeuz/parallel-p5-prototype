@@ -61,7 +61,7 @@ void main()
 	vec2 uv = gl_FragCoord.xy / iResolution.xy;
     uv.y = uv.y;
 	
-	float time = mod(iTime*100.0, 32.0)/110.0; // + modelmat[0].x + modelmat[0].z;
+	float time = mod(iTime*10.0, 32.0)/110.0; // + modelmat[0].x + modelmat[0].z;
 
 	float GLITCH = 0.1 + iMouse.x / iResolution.x * 0.1;
 	

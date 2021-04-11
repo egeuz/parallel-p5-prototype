@@ -64,7 +64,7 @@ function preload() {
 }
 
 function setup() {
-  pixelDensity(1)
+  if (isRetinaDisplay()) pixelDensity(1)
   setAttributes({})
   frameRate(24)
   rectMode(CENTER)
@@ -85,6 +85,7 @@ function setup() {
 }
 
 function windowResized() {
+  if (isRetinaDisplay()) pixelDensity(1)
   const w = document.getElementById("canvas-bg").clientWidth
   const h = w * 1.78
   //for horizontal, replace w/: h = w * ASPECT_RATIO
@@ -104,7 +105,7 @@ function draw() {
   glitchShader.setUniform("iResolution", [width, height]);
   glitchShader.setUniform("iFrame", frameCount);
   glitchShader.setUniform("iMouse", [mouseX, mouseY]);
-  glitchShader.setUniform("iTime", frameCount * 0.001);
+  glitchShader.setUniform("iTime", frameCount * 0.0000001);
   glitchShader.setUniform("iChannel0", pg);
 
   // clear()
@@ -116,7 +117,7 @@ function draw() {
 
   rect(0, 0, width, height)
 
-  // pg.clear()
+  pg.clear()
 
 }
 
@@ -135,7 +136,7 @@ function generateSamples() {
     const strip = new GlitchStrip({
       sampleImage: BASE_IMAGE_DATA,
       sampleArea: new Area(1, 0.01, BASE_IMAGE_DATA).init(),
-      renderArea: new Area(0.7).init(),
+      renderArea: new Area(0.65).init(),
       minSizeRatio: 0.04 * 1.5, //0.04
       maxSizeRatio: 0.017 * 1.5 //0.017
     }).init()
@@ -146,7 +147,7 @@ function generateSamples() {
     const fragment = new GlitchFragment({
       sampleImage: BASE_IMAGE_DATA,
       sampleArea: new Area(1, 0.1, BASE_IMAGE_DATA).init(),
-      renderArea: new Area(0.7).init(),
+      renderArea: new Area(0.65).init(),
       minSizeRatio: 0.09 * 1.5,
       maxSizeRatio: 0.16 * 1.5,
       minSampleRatio: 0.2,
@@ -159,7 +160,7 @@ function generateSamples() {
     const fragment = new GlitchFragment({
       sampleImage: BASE_IMAGE_DATA,
       sampleArea: new Area(1, 0.4, BASE_IMAGE_DATA).init(),
-      renderArea: new Area(1).init(),
+      renderArea: new Area(0.65).init(),
       minSizeRatio: 0.04 * 1.5,
       maxSizeRatio: 0.07 * 1.5,
       minSampleRatio: 0.1,
@@ -192,6 +193,13 @@ function shuffle(array) {
   for (let i = array.length - 1; i > 0; i--) {
     let j = Math.floor(Math.random() * (i + 1));
     [array[i], array[j]] = [array[j], array[i]];
+  }
+}
+
+function isRetinaDisplay() {
+  if (window.matchMedia) {
+      var mq = window.matchMedia("only screen and (min--moz-device-pixel-ratio: 1.3), only screen and (-o-min-device-pixel-ratio: 2.6/2), only screen and (-webkit-min-device-pixel-ratio: 1.3), only screen  and (min-device-pixel-ratio: 1.3), only screen and (min-resolution: 1.3dppx)");
+      return (mq && mq.matches || (window.devicePixelRatio > 1));
   }
 }
 
